@@ -1,4 +1,18 @@
+import sys, os
+
 from stringProcessor import *
+
+
+# Print blocking -------------------------------------------------------
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+# TESTS ----------------------------------------------------------------
 
 def removeWhiteSpaceTest():
     assert(removeWhitespace("hello \n testing ending \n") == "hellotestingending")
@@ -18,7 +32,9 @@ def checkIteratorSplitTest():
     testBlock = "$(0,3)[{XOR:a(&),b(&)->fg(&)}{AND:a(&),b(&)->fcout(&)}]{IteratorFreeBlock:a,b->c}$(0,2)[{a,b->c(&)}]$(3,4)[{a,b->c}]"
     assert(checkIteratorSplit(testBlock))
     testBlock2 = "$[][[]]"
+    blockPrint()
     assert(not checkIteratorSplit(testBlock2))
+    enablePrint()
 
 def splitIteratorTest():
     testBlock = "$(0,3)[{XOR:a(&),b(&)->fg(&)}{AND:a(&),b(&)->fcout(&)}]{IteratorFreeBlock:a,b->c}$(0,2)[{a,b->c(&)}]$(3,4)[{a,b->c}]{ClosedBlocks}{}"
@@ -30,7 +46,7 @@ def splitIteratorTest():
         "{ClosedBlocks}{}",
     ]
 
-    assert(splitIterator(testBlock) == expectedSplit)
+    assert(splitColumnToIterator(testBlock) == expectedSplit)
 
 # note order of operations is left to right
 def evaluteSimpleMathTest():
@@ -41,6 +57,13 @@ def evaluteSimpleMathTest():
     assert(evaluteSimpleMath(expr2) == 38)
     assert(evaluteSimpleMath(expr3) == 24)
 
+def expandIteratorTests():
+
+    # basic iterator test
+    expr1 = "$(0,3)[{TestBlock&:i&->o(&+1)}]"
+    expr1out = "{TestBlock0:i0->o1}{TestBlock1:i1->o2}{TestBlock2:i2->o3}{TestBlock3:i3->o4}"
+    assert(expandIterator(expr1) == expr1out)
+
 
 def runAllStringProcessorTests():
     removeWhiteSpaceTest()
@@ -48,7 +71,11 @@ def runAllStringProcessorTests():
     checkIteratorSplitTest()
     splitIteratorTest()
     evaluteSimpleMathTest()
+    expandIteratorTests()
     print("Passed All String Processor Tests!")
+
+
+
 
 if __name__ == "__main__":
     runAllStringProcessorTests()
