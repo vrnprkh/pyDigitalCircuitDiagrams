@@ -1,5 +1,6 @@
 import sys, os
 
+from block import *
 from stringProcessor import *
 
 
@@ -64,6 +65,10 @@ def expandIteratorTests():
     expr1out = "{TestBlock0:i0->o1}{TestBlock1:i1->o2}{TestBlock2:i2->o3}{TestBlock3:i3->o4}"
     assert(expandIterator(expr1) == expr1out)
 
+def splitBlocksTests():
+    expr = "{TestBlock0:i0->o1}{TestBlock1:i1->o2}{TestBlock2:i2->o3}{TestBlock3:i3->o4}"
+    assert(splitBlocks(expr) == ["TestBlock0:i0->o1","TestBlock1:i1->o2","TestBlock2:i2->o3","TestBlock3:i3->o4"])
+
 
 def runAllStringProcessorTests():
     removeWhiteSpaceTest()
@@ -72,6 +77,7 @@ def runAllStringProcessorTests():
     splitIteratorTest()
     evaluteSimpleMathTest()
     expandIteratorTests()
+    splitBlocksTests()
     print("Passed All String Processor Tests!")
 
 

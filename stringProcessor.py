@@ -1,3 +1,5 @@
+from block import *
+
 # format strings
 # 1. remove all whitespace
 # 2. split by column
@@ -30,8 +32,8 @@ def checkIteratorSplit(columnString):
     if not (len(iteratorOpen) == len(iteratorClose) == len(iteratorStarts)):
         print("Iterator split error due to unbalanced iterator starts: $, or iterator brackets: [, ]")
         return False
-    for e0, e1, e2 in iteratorStarts, iteratorOpen, iteratorClose:
-        if not (e0 < e1 and e1 < e2):
+    for i in range(len(iteratorOpen)):
+        if not (iteratorStarts[i] < iteratorOpen[i] and iteratorOpen[i] < iteratorClose[i]):
             print("Iterator split error due to misplaced iterator brackets, i.e $][")
             return False
     return True
@@ -162,7 +164,7 @@ def validIterator(iteratorString):
         
         for pair in mathPairs:
             if not checkValidMath(newTerm[pair[0] + 1:pair[1]]):
-                print('foo')
+                print('math error')
                 return False
     return True
 
@@ -207,29 +209,88 @@ def expandIterator(iteratorString):
     
     return expandedString
 
+
+def checkSplitBlocks(expandedColumnString):
+    openingBlocks = findAllStrings(expandedColumnString, "{")
+    closingBlocks = findAllStrings(expandedColumnString, "}")
+
+    if not (len(closingBlocks) == len(openingBlocks)):
+        print("Error Unequal amount of brackets in column.")
+        return False
+    for i in range(len(openingBlocks)):
+        if not (openingBlocks[i] < closingBlocks[i]):
+            print("Error Column bracket mismatch.")
+            return False
+    return True
+
 # splits an expanded column into individual blocks
 def splitBlocks(expandedColumnString):
-    pass
+    assert(checkSplitBlocks(expandedColumnString))
+    split = expandedColumnString.split("}{")
+    split[0] = split[0][1:]
+    split[-1] = split[-1][:-1]
+    return split
+    
 
 # checks if the block is valid
 def validBlock(blockString):
-    pass
+    nameSep = findAllStrings(blockString, ":")
+    if len(nameSep) > 1:
+        print("InvalidBlock1")
+        return False
+    
+    nameLess = ""
+    if len(nameSep) == 1:
+        nameLess += blockString[nameSep[0] + 1:]
+    else:
+        nameLess += blockString
+    
+    virtualHeightSep = findAllStrings(blockString, "#")
+    if len(virtualHeightSep) > 1:
+        print("InvalidBlock2")
+        return False
+    
+    nameHeightLess = ""
+    if len(virtualHeightSep) == 1:
+        nameHeightLess += nameLess[:virtualHeightSep[0]]
+        height = blockString[virtualHeightSep[0] + 1:]
+        if not height.isdigit():
+            print("InvalidBlock3")
+            return False
+    else:
+        nameHeightLess += nameLess
+    
+    IOsplit = findAllStrings(nameHeightLess, "->")
+    if len(IOsplit) != 1:
+        return False
+    return True
+
+
+
 
 # uses everything above to check if an entire column is valid
 def validColumn(columnString):
     if not (checkIteratorSplit(columnString)):
         print("IteratorSplit error above.")
         return False
-
-    splitIterators = splitColumnToIterator(columnString)
-
-
+    columnSplitByIterator = splitColumnToIterator(columnString)
+    for iterator in columnSplitByIterator:
+        if not validIterator(iterator):
+            return False
+    expanded = "".join([expandIterator(iterator) for iterator in columnSplitByIterator])
+    if not checkSplitBlocks(expanded):
+        return False
+    blocks = splitBlocks(expanded)
+    for block in blocks:
+        if not validBlock(block):
+            return False
+    return True
 
 
 
 
         
-# returns a list of expanded blocks after checking for errors
+# returns a list of columns each having a list of blocks oafter checking for errors
 
 def process(inputString):
     columns = removeWhitespace(inputString).split(";")
@@ -242,6 +303,29 @@ def process(inputString):
     if not valid:
         print("Unable to generate diagram due to errors above.")
         return
+
+    
+    # now a list
+    columnsSplitByIterator = [splitColumnToIterator(column) for column in columns]
+    
+    expandedColumns = []
+    for column in columnsSplitByIterator:
+        columnString = ""
+        for iterator in column:
+            columnString += expandIterator(iterator)
+        expandedColumns.append(columnString)
+    
+    blocksInColumns = []
+    for column in expandedColumns:
+        blocksInColumns.append(splitBlocks(column))
+    
+    return blocksInColumns
+                
+
+print(process("$(0,3)[{XOR:a(&),b(&)->fg(&)}{AND:a(&),b(&)->fcout(&)}];{IteratorFreeBlock:a,b->c}$(0,2)[{a,b->c(&)}]$(3,4)[{a,b->c}]"))
+        
+            
+
 
     
         
