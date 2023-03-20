@@ -1,3 +1,6 @@
+from stringProcessor import *
+
+
 class Block:
     def __init__(self, name, inputPorts, inputNames, outputPorts, outputNames, displayHeight):
         #pre
@@ -17,8 +20,15 @@ class Block:
 
 
 class Column:
-    def __init__(self, blocks):
-        self.blocks = blocks
+    def __init__(self, blockStrings):
+        self.blocks = []
+        for blockString in blockStrings:
+            self.addBlockStringToBlocks(blockString)
+
+
+    def addBlockStringToBlocks(self, blockString):
+        self.blocks.append(createBlock(blockString))
+
 
 class Boards:
     def __init(self, columns):

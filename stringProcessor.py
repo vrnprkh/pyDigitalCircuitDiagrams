@@ -1,4 +1,4 @@
-from block import *
+from block import Block
 
 # format strings
 # 1. remove all whitespace
@@ -266,8 +266,50 @@ def validBlock(blockString):
     return True
 
 
+def createBlock(blockString):
+    assert(validBlock(blockString))
+    nameSep = findAllStrings(blockString, ":")
+    name = blockString[:nameSep]
+    nameLess = ""
+    if len(nameSep) == 1:
+        nameLess += blockString[nameSep[0] + 1:]
+    else:
+        nameLess += blockString
+    
+    virtualHeightSep = findAllStrings(nameLess, "#")
+    
+    nameHeightLess = ""
+    if len(virtualHeightSep) == 1:
+        nameHeightLess += nameLess[:virtualHeightSep[0]]
+        height = int(blockString[virtualHeightSep[0] + 1:])
+    else:
+        nameHeightLess += nameLess
+    
+    splitIO = nameHeightLess.split("->")
+    inputs = splitIO[0].split(",")
+    outputs =splitIO[1].split(",")
+    inputPorts = []
+    inputNames = []
+    outputPorts = []
+    outputNames = []
+    for i in inputs:
+        if "." in i:
+            inputPorts.append(i.split(".")[0])
+            inputNames.append(i.split(".")[1])
+        else:
+            inputPorts.append(i)
+            inputNames.append("")
+    for o in outputs:
+        if "." in o:
+            outputPorts.append(i.split(".")[0])
+            outputNames.append(i.split(".")[1])
+        else:
+            outputPorts.append(i)
+            outputNames.append("")
 
-
+    returnBlock = Block(name, inputPorts, inputNames, outputPorts, outputNames, height)
+    return returnBlock
+        
 # uses everything above to check if an entire column is valid
 def validColumn(columnString):
     if not (checkIteratorSplit(columnString)):
@@ -320,13 +362,4 @@ def process(inputString):
         blocksInColumns.append(splitBlocks(column))
     
     return blocksInColumns
-                
-
-print(process("$(0,3)[{XOR:a(&),b(&)->fg(&)}{AND:a(&),b(&)->fcout(&)}];{IteratorFreeBlock:a,b->c}$(0,2)[{a,b->c(&)}]$(3,4)[{a,b->c}]"))
-        
-            
-
-
-    
-        
 
