@@ -17,6 +17,9 @@ class Block:
     def getHeight(self): # name height + max number of ports
         return self.displayHeight
 
+    def __str__(self):
+        return f"Name: {self.name}\nInputPorts: {self.inputPorts}\nInputNames: {self.inputNames}\nOutputPorts: {self.outputPorts}\nOutputNames: {self.outputNames}\ninternalHeight: {self.internalHeight}\ndisplayHeight: {self.displayHeight}"
+
 
 
 class Column:
@@ -24,13 +27,14 @@ class Column:
         self.blocks = []
         for blockString in blockStrings:
             self.addBlockStringToBlocks(blockString)
-
-
+    
     def addBlockStringToBlocks(self, blockString):
-        self.blocks.append(createBlock(blockString))
+        newBlock = createBlock(blockString)
+        self.blocks.append(newBlock)
 
 
-class Boards:
+
+class Board:
     def __init(self, columns):
         self.columns = columns
 

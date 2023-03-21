@@ -1,4 +1,4 @@
-from block import Block
+from block import Block, Column, Board
 
 # format strings
 # 1. remove all whitespace
@@ -244,8 +244,7 @@ def validBlock(blockString):
         nameLess += blockString[nameSep[0] + 1:]
     else:
         nameLess += blockString
-    
-    virtualHeightSep = findAllStrings(blockString, "#")
+    virtualHeightSep = findAllStrings(nameLess, "#")
     if len(virtualHeightSep) > 1:
         print("InvalidBlock2")
         return False
@@ -253,15 +252,15 @@ def validBlock(blockString):
     nameHeightLess = ""
     if len(virtualHeightSep) == 1:
         nameHeightLess += nameLess[:virtualHeightSep[0]]
-        height = blockString[virtualHeightSep[0] + 1:]
+        height = nameLess[virtualHeightSep[0] + 1:]
         if not height.isdigit():
             print("InvalidBlock3")
             return False
     else:
         nameHeightLess += nameLess
-    
     IOsplit = findAllStrings(nameHeightLess, "->")
     if len(IOsplit) != 1:
+        print("incorrect seperator for function mapping")
         return False
     return True
 
@@ -269,7 +268,10 @@ def validBlock(blockString):
 def createBlock(blockString):
     assert(validBlock(blockString))
     nameSep = findAllStrings(blockString, ":")
-    name = blockString[:nameSep]
+    if len(nameSep) == 1:
+        name = blockString[:nameSep[0]]
+    else:
+        name = ""
     nameLess = ""
     if len(nameSep) == 1:
         nameLess += blockString[nameSep[0] + 1:]
@@ -281,13 +283,14 @@ def createBlock(blockString):
     nameHeightLess = ""
     if len(virtualHeightSep) == 1:
         nameHeightLess += nameLess[:virtualHeightSep[0]]
-        height = int(blockString[virtualHeightSep[0] + 1:])
+        height = int(nameLess[virtualHeightSep[0] + 1:])
     else:
         nameHeightLess += nameLess
+        height = 0
     
     splitIO = nameHeightLess.split("->")
     inputs = splitIO[0].split(",")
-    outputs =splitIO[1].split(",")
+    outputs = splitIO[1].split(",")
     inputPorts = []
     inputNames = []
     outputPorts = []
@@ -301,10 +304,10 @@ def createBlock(blockString):
             inputNames.append("")
     for o in outputs:
         if "." in o:
-            outputPorts.append(i.split(".")[0])
-            outputNames.append(i.split(".")[1])
+            outputPorts.append(o.split(".")[0])
+            outputNames.append(o.split(".")[1])
         else:
-            outputPorts.append(i)
+            outputPorts.append(o)
             outputNames.append("")
 
     returnBlock = Block(name, inputPorts, inputNames, outputPorts, outputNames, height)
@@ -318,9 +321,11 @@ def validColumn(columnString):
     columnSplitByIterator = splitColumnToIterator(columnString)
     for iterator in columnSplitByIterator:
         if not validIterator(iterator):
+            print("not valid iterator")
             return False
     expanded = "".join([expandIterator(iterator) for iterator in columnSplitByIterator])
     if not checkSplitBlocks(expanded):
+
         return False
     blocks = splitBlocks(expanded)
     for block in blocks:
@@ -362,4 +367,3 @@ def process(inputString):
         blocksInColumns.append(splitBlocks(column))
     
     return blocksInColumns
-

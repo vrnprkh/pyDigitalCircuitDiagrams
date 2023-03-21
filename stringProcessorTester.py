@@ -1,6 +1,4 @@
 import sys, os
-
-from block import *
 from stringProcessor import *
 
 
@@ -69,6 +67,19 @@ def splitBlocksTests():
     expr = "{TestBlock0:i0->o1}{TestBlock1:i1->o2}{TestBlock2:i2->o3}{TestBlock3:i3->o4}"
     assert(splitBlocks(expr) == ["TestBlock0:i0->o1","TestBlock1:i1->o2","TestBlock2:i2->o3","TestBlock3:i3->o4"])
 
+def createBlockTest():
+    expr = "XOR:a0.nameOfa0,bO0.nameOfboO0->fg0#69"
+    testBlock = createBlock(expr)
+    # print(testBlock)
+    
+def comprehensiveTest():
+    expr = "$(0,3)[{XOR:a(&),b(&)->fg(&)}{AND:a(&),b(&)->fcout(&)}]{IteratorFreeBlock:a,b->c}$(0,2)[{a,b->c(&)}]$(3,4)[{a,b->c}]"
+    processed = process(expr)
+    print(processed)
+    for column in processed:
+        for block in column:
+            print(createBlock(block))
+
 
 def runAllStringProcessorTests():
     removeWhiteSpaceTest()
@@ -78,6 +89,8 @@ def runAllStringProcessorTests():
     evaluteSimpleMathTest()
     expandIteratorTests()
     splitBlocksTests()
+    createBlockTest()
+    comprehensiveTest()
     print("Passed All String Processor Tests!")
 
 
