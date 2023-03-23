@@ -1,4 +1,6 @@
 from stringProcessor import *
+from constants import *
+
 
 
 class Block:
@@ -19,6 +21,11 @@ class Block:
 
     def __str__(self):
         return f"Name: {self.name}\nInputPorts: {self.inputPorts}\nInputNames: {self.inputNames}\nOutputPorts: {self.outputPorts}\nOutputNames: {self.outputNames}\ninternalHeight: {self.internalHeight}\ndisplayHeight: {self.displayHeight}"
+    def draw(self, x, y):
+        topLeft = x * SCALE, y * SCALE
+        bottomRight = (x + STANDARD_WIDTH) * SCALE, (y + self.internalHeight) * SCALE 
+        
+        
 
 
 
