@@ -119,7 +119,6 @@ class Board:
         x = BORDER
         for column in self.columns:
             column.drawColumn(x, drawNewImage)
-            print(x)
             x+= (STANDARD_WIDTH + H_SPACING)
         
         newImage.show()

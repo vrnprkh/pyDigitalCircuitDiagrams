@@ -1,4 +1,5 @@
-# OVERVIEW
+# Overview
+Note: This project is a work in progress. The documentation is not complete, and wire connections curently do not render.
 
 ## Blocks
 
