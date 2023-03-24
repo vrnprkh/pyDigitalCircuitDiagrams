@@ -61,8 +61,10 @@ To create blocks iteratively, use the following notation around any set of block
 
 `$(start, end)[{Block1}{Block2}...{Blockn}]`
 
-Start and end can be any two postive integers. If start is greater than end, iterator is done in reverse order.
-To use the numbers in the range of the iterator is the `&` symbol to reference the number. For example:
+Start and end can be any two postive integers and the range is inclusive.
+If start is greater than end, iterator is done in reverse order.
+To use the numbers in the range of the iterator is the `&` symbol to reference the number.
+For example:
 
 `$(0,3)[{CoolBlock&: a&.nameOfA&, b&.nameOfB&->c&.nameOfC&}]`
 
@@ -70,4 +72,11 @@ would expand to
 
 `{CoolBlock0: a0.nameOfA0, b0.nameOfB0->c0.nameOfC0}{CoolBlock1: a1.nameOfA1, b1.nameOfB1->c1.nameOfC1}{CoolBlock2: a2.nameOfA2, b2.nameOfB2->c2.nameOfC2}{CoolBlock3: a3.nameOfA3, b3.nameOfB3->c3.nameOfC3}`
 
-<!-- ![alt text](images/SampleImage1.heic "SampleImage1") -->
+Iterators can also do basic math using +, - and *. The order of operations is left to right. Math must be placed in parentheses `()`. For example:
+
+`$(2,0)[{a->b(& + 1)(& + 1 * &), c(3 - &)}]`
+
+would expand to
+
+'{a->b36, c1}{a->b23, c2}{a->b10, c3}`
+
