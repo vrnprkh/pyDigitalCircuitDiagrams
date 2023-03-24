@@ -70,3 +70,4 @@ would expand to
 
 `{CoolBlock0: a0.nameOfA0, b0.nameOfB0->c0.nameOfC0}{CoolBlock1: a1.nameOfA1, b1.nameOfB1->c1.nameOfC1}{CoolBlock2: a2.nameOfA2, b2.nameOfB2->c2.nameOfC2}{CoolBlock3: a3.nameOfA3, b3.nameOfB3->c3.nameOfC3}`
 
+![alt text](images/SampleImage1.heic "SampleImage1")
