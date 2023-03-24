@@ -1,6 +1,6 @@
 from stringProcessor import *
 from constants import *
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 
 #TODO move this to object
@@ -74,6 +74,17 @@ class Block:
         topLeft = (x * SCALE, y * SCALE)
         bottomRight = ((x + STANDARD_WIDTH) * SCALE, (y + self.internalHeight) * SCALE )
         image.rectangle([topLeft, bottomRight], fill = BLOCK_COLOUR, outline = BLOCK_OUTLINE)
+
+        nameFont = ImageFont.truetype("Keyboard.ttf", FONT_SIZE * 2)
+        image.text(((2 * x + STANDARD_WIDTH )//2 * SCALE , y * SCALE), self.name, fill="black", anchor="ma", font=nameFont)
+
+
+        font = ImageFont.truetype("Keyboard.ttf", FONT_SIZE)
+        for i, e in enumerate(self.inputNames):
+            image.text((x * SCALE + 3, (y + i + 2) * SCALE  - 3), e, fill="black", anchor="ls", font=font)
+        for i, e in enumerate(self.outputNames):
+            image.text(((x + STANDARD_WIDTH) * SCALE - 3, (y + i + 2) * SCALE - 3), e, fill="black", anchor="rs", font=font)
+
         
         
 class Column:
