@@ -1,5 +1,3 @@
-from block import Block, Column, Board
-
 # format strings
 # 1. remove all whitespace
 # 2. split by column
@@ -29,11 +27,15 @@ def checkIteratorSplit(columnString):
     iteratorStarts = findAllStrings(columnString, "$")
     iteratorOpen = findAllStrings(columnString, "[")
     iteratorClose = findAllStrings(columnString, "]")
-    if not (len(iteratorOpen) == len(iteratorClose) == len(iteratorStarts)):
+    if len(iteratorStarts)< 1 and (len(iteratorOpen) > 0):
+        return False
+    if iteratorStarts[0] != 0:
+        return False
+    if not (len(iteratorOpen) == len(iteratorClose)):
         print("Iterator split error due to unbalanced iterator starts: $, or iterator brackets: [, ]")
         return False
     for i in range(len(iteratorOpen)):
-        if not (iteratorStarts[i] < iteratorOpen[i] and iteratorOpen[i] < iteratorClose[i]):
+        if not (iteratorOpen[i] < iteratorClose[i]):
             print("Iterator split error due to misplaced iterator brackets, i.e $][")
             return False
     return True
@@ -263,55 +265,6 @@ def validBlock(blockString):
         print("incorrect seperator for function mapping")
         return False
     return True
-
-
-def createBlock(blockString):
-    assert(validBlock(blockString))
-    nameSep = findAllStrings(blockString, ":")
-    if len(nameSep) == 1:
-        name = blockString[:nameSep[0]]
-    else:
-        name = ""
-    nameLess = ""
-    if len(nameSep) == 1:
-        nameLess += blockString[nameSep[0] + 1:]
-    else:
-        nameLess += blockString
-    
-    virtualHeightSep = findAllStrings(nameLess, "#")
-    
-    nameHeightLess = ""
-    if len(virtualHeightSep) == 1:
-        nameHeightLess += nameLess[:virtualHeightSep[0]]
-        height = int(nameLess[virtualHeightSep[0] + 1:])
-    else:
-        nameHeightLess += nameLess
-        height = 0
-    
-    splitIO = nameHeightLess.split("->")
-    inputs = splitIO[0].split(",")
-    outputs = splitIO[1].split(",")
-    inputPorts = []
-    inputNames = []
-    outputPorts = []
-    outputNames = []
-    for i in inputs:
-        if "." in i:
-            inputPorts.append(i.split(".")[0])
-            inputNames.append(i.split(".")[1])
-        else:
-            inputPorts.append(i)
-            inputNames.append("")
-    for o in outputs:
-        if "." in o:
-            outputPorts.append(o.split(".")[0])
-            outputNames.append(o.split(".")[1])
-        else:
-            outputPorts.append(o)
-            outputNames.append("")
-
-    returnBlock = Block(name, inputPorts, inputNames, outputPorts, outputNames, height)
-    return returnBlock
         
 # uses everything above to check if an entire column is valid
 def validColumn(columnString):
