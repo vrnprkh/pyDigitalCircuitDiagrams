@@ -78,5 +78,5 @@ Iterators can also do basic math using +, - and *. The order of operations is le
 
 would expand to
 
-'{a->b36, c1}{a->b23, c2}{a->b10, c3}`
+`{a->b36, c1}{a->b23, c2}{a->b10, c3}`
 
