@@ -13,5 +13,5 @@ inputStr = """
     $(3,0)[{OR: fcout&, scout& -> cin(&+1).cout&#10}]
     """
 inputStr2 = """$(0,3)[{CoolBlock&: a&.nameOfA&, b&.nameOfB&->c&.nameOfC&}]"""
-
-fullBuild(inputStr)
+inputStr3 = "{NOR:S, Q2 -> Q1^}{NOR: Q1, R -> Q2^}"
+fullBuild(inputStr3)

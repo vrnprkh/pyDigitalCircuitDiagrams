@@ -43,18 +43,25 @@ def splitColumnToIterator(columnString):
     # pre
     assert(checkIteratorSplit(columnString))
 
+
     iteratorStarts = findAllStrings(columnString, "$")
     iteratorClose = findAllStrings(columnString, "]")
     output = []
+
+    if len(iteratorStarts) == 0:
+        return columnString
     if len(iteratorStarts) > 0:
         if iteratorStarts[0] != 0:
             output.append(columnString[0:iteratorStarts[0]])
     
+
+
     for i, e0 in enumerate(iteratorStarts):
         output.append(columnString[e0:iteratorClose[i]+1])
         if (i < len(iteratorStarts) - 1) and (iteratorClose[i] + 1 < len(columnString) - 1):
             if not (iteratorStarts[i + 1] == iteratorClose[i] + 1):
                 output.append(columnString[iteratorClose[i]+1:iteratorStarts[i + 1]])
+    
     if iteratorClose[-1] < len(columnString) - 1:
         output.append(columnString[iteratorClose[-1] + 1:])
     
