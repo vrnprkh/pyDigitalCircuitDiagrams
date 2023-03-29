@@ -320,3 +320,19 @@ def process(inputString):
         blocksInColumns.append(splitBlocks(column))
     
     return blocksInColumns
+
+
+
+# other helpers
+
+def filterOutString(inputString, characters):
+    returnStr = ""
+    for e in inputString:
+        if e not in characters:
+            returnStr += e
+    
+    return returnStr
+
+
+def filterDictKeys(inputDict, characters):
+    return [filterOutString(e, characters) for e in inputDict]

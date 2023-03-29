@@ -1,5 +1,5 @@
 # Overview
-Note: This project is a work in progress. The documentation is not complete, and wire connections curently do not render.
+Note: This project is a work in progress. Wire connections are implemented lazily, and the documentation may not be complete.
 
 ## Blocks
 
@@ -79,4 +79,20 @@ Iterators can also do basic math using +, - and *. The order of operations is le
 would expand to
 
 `{a->b36, c1}{a->b23, c2}{a->b10, c3}`
+
+
+
+# Examples
+
+Note: Wires are currently simply drawn as straight lines.
+
+4-bit Full Adder:
+
+```
+$(3,0)[{XOR: a&.a&, b&.b& -> fg&}{AND: a&.a&, b&.b& -> fcout&}];
+$(3,0)[{XOR: cin&.cin&, fg& -> sg&^}{AND: cin&.cin&, fg& -> scout&^.output&}];
+$(3,0)[{OR: fcout&, scout& -> cin(&+1).cout&#10}
+]```
+
+![](images/sampleImage1.PNG)
 

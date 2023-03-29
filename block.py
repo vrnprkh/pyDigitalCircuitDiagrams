@@ -1,7 +1,7 @@
 from stringProcessor import *
 from constants import *
 from PIL import Image, ImageDraw, ImageFont
-
+from wires import WireGrid
 
 #TODO move this to object
 def createBlock(blockString):
@@ -63,14 +63,19 @@ class Block:
         self.outputPorts = outputPorts
         self.outputNames = outputNames
         self.internalHeight = 1 + max(len(inputPorts), len(outputPorts))
-        self.displayHeight = max(self.internalHeight+ V_SPACE, displayHeight) 
+        self.displayHeight = max(self.internalHeight + V_SPACE, displayHeight) 
     
     def getBlockHeight(self): # name height + max number of ports
         return self.displayHeight
 
+    def getRealHeight(self):
+        return self.internalHeight
+
     def __str__(self):
+        # for testing
         return f"Name: {self.name}\nInputPorts: {self.inputPorts}\nInputNames: {self.inputNames}\nOutputPorts: {self.outputPorts}\nOutputNames: {self.outputNames}\ninternalHeight: {self.internalHeight}\ndisplayHeight: {self.displayHeight}"
     def drawBlock(self, x, y, image):
+        # TODO clean this
         topLeft = (x * SCALE, y * SCALE)
         bottomRight = ((x + STANDARD_WIDTH) * SCALE, (y + self.internalHeight) * SCALE )
         image.rectangle([topLeft, bottomRight], fill = BLOCK_COLOUR, outline = BLOCK_OUTLINE)
@@ -78,12 +83,19 @@ class Block:
         nameFont = ImageFont.truetype("Keyboard.ttf", FONT_SIZE * 2)
         image.text(((2 * x + STANDARD_WIDTH )//2 * SCALE , y * SCALE), self.name, fill="black", anchor="ma", font=nameFont)
 
-
         font = ImageFont.truetype("Keyboard.ttf", FONT_SIZE)
         for i, e in enumerate(self.inputNames):
-            image.text((x * SCALE + 3, (y + i + 2) * SCALE  - 3), e, fill="black", anchor="ls", font=font)
+            eDraw = DEFAULT_PORT + e
+            image.text((x * SCALE + 3, (y + i + 2) * SCALE  - 3), eDraw, fill="black", anchor="ls", font=font)
         for i, e in enumerate(self.outputNames):
-            image.text(((x + STANDARD_WIDTH) * SCALE - 3, (y + i + 2) * SCALE - 3), e, fill="black", anchor="rs", font=font)
+            
+            eDraw = e + DEFAULT_PORT
+            image.text(((x + STANDARD_WIDTH) * SCALE - 3, (y + i + 2) * SCALE - 3), eDraw, fill="black", anchor="rs", font=font)
+
+    def getInputPortPixels(self, x, y):
+        return [(port, (x * SCALE, int((y + i  + 1.5) * SCALE))) for i, port in enumerate(self.inputPorts)]
+    def getOutputPortPixels(self, x, y):
+        return [(port, ((x + STANDARD_WIDTH) * SCALE, int((y + i  + 1.5) * SCALE))) for i, port in enumerate(self.outputPorts)]
 
         
         
@@ -100,16 +112,51 @@ class Column:
             block.drawBlock(x, y, image)
             y += block.getBlockHeight()
 
+    def getRectangles(self, x):
+        y = BORDER
+        rectangles = []
+        for block in self.blocks:
+            rectangles.append(((x * SCALE, y * SCALE), ((x + STANDARD_WIDTH) * SCALE, (y + block.getRealHeight()) * SCALE)))
+            y += block.getBlockHeight()
+        return rectangles
+
+    def getAllBlocksInputPPs(self, x):
+        y = BORDER
+        blockInputPPs = []
+        for block in self.blocks:
+            blockInputPPs.append(block.getInputPortPixels(x, y))
+            y += block.getBlockHeight()
+        return blockInputPPs
+    def getAllBlocksOutputPPs(self, x):
+        y = BORDER
+        blockOutputPPs = []
+        for block in self.blocks:
+            blockOutputPPs.append(block.getOutputPortPixels(x, y))
+            y += block.getBlockHeight()
+        return blockOutputPPs
+
+
 class Board:
     def __init__(self, processesedStr):
         self.columns = []
         for column in processesedStr:
             self.columns.append(Column([createBlock(block) for block in column]))
+        
+        #board sizing
+        self.width = int(len(self.columns) * (STANDARD_WIDTH + H_SPACING) * SCALE + 2 * BORDER * SCALE)
+        self.height = int(max([column.getColumnHeight() for column in self.columns]) * SCALE + 2 * BORDER * SCALE)
 
+        # useful for wire drawing
+        self.rectangles = []
+        x = BORDER
+        for column in self.columns:
+            for e in column.getRectangles(x):
+                self.rectangles.append(e)
+            x+= (STANDARD_WIDTH + H_SPACING)
 
     def drawBoard(self):
-        totalWidth = int(len(self.columns) * (STANDARD_WIDTH + H_SPACING) * SCALE + 2 * BORDER * SCALE)
-        maxColumnHeight = int(max([column.getColumnHeight() for column in self.columns]) * SCALE + 2 * BORDER * SCALE)
+        totalWidth = self.width
+        maxColumnHeight = self.height
         newImage = Image.new("RGB", (totalWidth, maxColumnHeight))
         drawNewImage = ImageDraw.Draw(newImage)
 
@@ -120,8 +167,82 @@ class Board:
         for column in self.columns:
             column.drawColumn(x, drawNewImage)
             x+= (STANDARD_WIDTH + H_SPACING)
-        
+            
+        self.drawWires(drawNewImage)
+        self.drawBadWires(drawNewImage)
         newImage.show()
+    
+    def findAllConnectionPixels(self):
+        # takes form [portName , [(x0,y0), (x1, y1), ...]]
+        filterChars = ("^", "_")
+        inputCoordinates = dict()
+        outputCoordinates = dict()
+        x = BORDER
+        for column in self.columns:
+            
+            for PPs in column.getAllBlocksInputPPs(x):
+                for PP in PPs:
+                    if PP[0] in inputCoordinates:
+                        inputCoordinates[PP[0]].append(PP[1])
+                    else:
+                        inputCoordinates[PP[0]] = [PP[1],]
+            
+            for PPs in column.getAllBlocksOutputPPs(x):
+                for PP in PPs:
+                    if PP[0] in outputCoordinates:
+                        outputCoordinates[PP[0]].append(PP[1])
+                    else:
+                        outputCoordinates[PP[0]] = [PP[1],]
+            x += STANDARD_WIDTH + H_SPACING
+        connections = []
+
+        # forced IO
         
+        for keyIn in inputCoordinates:
+            if ((filterOutString(keyIn, filterChars) not in filterDictKeys(outputCoordinates, filterChars)) or ("^" in keyIn)) and ("_" not in keyIn):
+                for inputCoord in inputCoordinates[keyIn]:
+                    connections.append(((BORDER, inputCoordinates[keyIn][0][1]), inputCoord))
+        
+        for keyOut in outputCoordinates:
+            if ((filterOutString(keyOut, filterChars) not in filterDictKeys(inputCoordinates, filterChars)) or ("^" in keyOut)) and ("_" not in keyOut):
+                for outputCoord in outputCoordinates[keyOut]:
+                    connections.append(((self.width - BORDER, outputCoordinates[keyOut][0][1]), outputCoord))
+
+
+        # remove special nonsense
+        newInputCoordinates = dict()
+        newOutputCoordinates = dict()
+        
+        for keyIn in inputCoordinates:
+            newInputCoordinates[filterOutString(keyIn, filterChars)] = inputCoordinates[keyIn]
+        for keyOut in outputCoordinates:
+            newOutputCoordinates[filterOutString(keyOut, filterChars)] = outputCoordinates[keyOut]
+
+        # internal
+        for keyOut in newOutputCoordinates:
+            if keyOut in newInputCoordinates:
+                for outputCoord in newOutputCoordinates[keyOut]:
+                    for inputCoord in newInputCoordinates[keyOut]:
+                        connections.append((outputCoord, inputCoord))
+
+        
+        
+
+
+        return connections
+
+    def getRailSpace(self):
+        rails = [((BORDER + i * (STANDARD_WIDTH + H_SPACING)) * SCALE, (BORDER + i * STANDARD_WIDTH + (i + 1) * H_SPACING) * SCALE) for i in range(len(self.columns) - 1)]
+        rails.append((0, BORDER))
+        rails.append((((len(self.columns) - 1) * (STANDARD_WIDTH + H_SPACING) + BORDER) * SCALE, self.width))
+        return rails
+
+    def drawBadWires(self, drawImage):
+        for e in self.findAllConnectionPixels():
+            drawImage.line(e, "black", WIREPIXELS)
+
+
+    def drawWires(self, drawImage):
+        wires = WireGrid(self.rectangles, self.findAllConnectionPixels(), self.width, self.height, WIREPIXELS, self.getRailSpace())
 
         
