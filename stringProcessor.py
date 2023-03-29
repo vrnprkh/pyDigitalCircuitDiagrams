@@ -27,9 +27,7 @@ def checkIteratorSplit(columnString):
     iteratorStarts = findAllStrings(columnString, "$")
     iteratorOpen = findAllStrings(columnString, "[")
     iteratorClose = findAllStrings(columnString, "]")
-    if len(iteratorStarts)< 1 and (len(iteratorOpen) > 0):
-        return False
-    if iteratorStarts[0] != 0:
+    if len(iteratorStarts) < 1 and (len(iteratorOpen) > 0):
         return False
     if not (len(iteratorOpen) == len(iteratorClose)):
         print("Iterator split error due to unbalanced iterator starts: $, or iterator brackets: [, ]")
@@ -47,8 +45,11 @@ def splitColumnToIterator(columnString):
 
     iteratorStarts = findAllStrings(columnString, "$")
     iteratorClose = findAllStrings(columnString, "]")
-
     output = []
+    if len(iteratorStarts) > 0:
+        if iteratorStarts[0] != 0:
+            output.append(columnString[0:iteratorStarts[0]])
+    
     for i, e0 in enumerate(iteratorStarts):
         output.append(columnString[e0:iteratorClose[i]+1])
         if (i < len(iteratorStarts) - 1) and (iteratorClose[i] + 1 < len(columnString) - 1):
