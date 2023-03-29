@@ -35,18 +35,18 @@ To disable this place an `_` anywhere in the port label. For example:
 
 `{a, b -> c_.nameOfC}`
 
-To force a output line from a linked output port, place a `^` on the port label. For example:
+To force an output line from a linked output port, place a `^` on the port label. For example:
 
 `{NOR:S.Set, Q2 -> Q1^.output1}{NOR: Q1, R.Reset -> Q2^.output2}`
 
 
 ### Block Height
 
-Blocks have two heights, an internal height (or a draw height) and a display height.
+Blocks have two heights; an internal height (or a draw height) and a display height.
 The internal height is the vertical height of the block, and is calculated as
 `1 + max(numberOfInputs, numberOfOutputs)`.
 This is the height of the block drawn.
-The display height is the internalHeight + 2 by default, but can be set to any value greater than that manually.
+The display height is the `internalHeight + 2` by default, but can be set to any value greater than that manually.
 To set this, end the block with `#height`. For example:
 
 `{a, b -> c, d#10}`
