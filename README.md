@@ -51,8 +51,8 @@ To set this, end the block with `#height`. For example:
 
 `{a, b -> c, d#10}`
 
-Would create a block with internal height 3 (1 + max(2,2)) and a display height of 10.
-If the display height specified is less than internalHeight + 2, then it is set to internalHeight + 2 regardless.
+Would create a block with internal height 3 (`1 + max(2,2)`) and a display height of 10.
+If the display height specified is less than `internalHeight + 2`, then it is set to `internalHeight + 2` regardless.
 Changing the display height is useful to align gates between columns for spacing issues.
 
 ## Iterators
