@@ -92,7 +92,8 @@ Note: Wires are currently simply drawn as straight lines.
 $(3,0)[{XOR: a&.a&, b&.b& -> fg&}{AND: a&.a&, b&.b& -> fcout&}];
 $(3,0)[{XOR: cin&.cin&, fg& -> sg&^}{AND: cin&.cin&, fg& -> scout&^.output&}];
 $(3,0)[{OR: fcout&, scout& -> cin(&+1).cout&#10}
-]```
+]
+```
 
 ![](images/sampleImage1.PNG)
 
