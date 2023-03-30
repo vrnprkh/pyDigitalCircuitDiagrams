@@ -80,6 +80,11 @@ would expand to
 
 `{a->b36, c1}{a->b23, c2}{a->b10, c3}`
 
+## Blank ports
+
+To delcare an empty port use an `_` as the port name.
+This will create a port on the block, that will not draw, which is useful to prevent wire clashes.
+
 
 
 # Examples
@@ -94,5 +99,5 @@ $(3,0)[{XOR: cin&.cin&, fg& ->_,sg&^.output&}{AND: cin&.cin&, fg& -> scout&}];
 $(3,0)[{OR: fcout&, scout& -> cin(&+1).cout&#10}]
 ```
 
-![](images/sampleImage1.PNG)
+![](images/sampleImage2.PNG)
 

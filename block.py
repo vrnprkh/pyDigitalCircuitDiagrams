@@ -81,19 +81,21 @@ class Block:
         image.rectangle([topLeft, bottomRight], fill = BLOCK_COLOUR, outline = BLOCK_OUTLINE)
 
         nameFont = ImageFont.truetype("Keyboard.ttf", FONT_SIZE * 2)
-        image.text(((2 * x + STANDARD_WIDTH )//2 * SCALE , y * SCALE), self.name, fill="black", anchor="ma", font=nameFont)
+        image.text(((2 * x + STANDARD_WIDTH )//2 * SCALE , y * SCALE), self.name, fill=TITLE_FONT_COLOR, anchor="ma", font=nameFont)
 
         font = ImageFont.truetype("Keyboard.ttf", FONT_SIZE)
         for i, e in enumerate(self.inputNames):
             eDraw = DEFAULT_PORT + e
-            image.text((x * SCALE + 3, (y + i + 2) * SCALE  - 3), eDraw, fill="black", anchor="ls", font=font)
+            if filterOutString(self.inputPorts[i], ("_")) != "":
+                image.text((x * SCALE + 3, (y + i + 2) * SCALE  - 3), eDraw, fill=PORT_FONT_COLOR, anchor="ls", font=font)
         for i, e in enumerate(self.outputNames):
             
             eDraw = e + DEFAULT_PORT
-            image.text(((x + STANDARD_WIDTH) * SCALE - 3, (y + i + 2) * SCALE - 3), eDraw, fill="black", anchor="rs", font=font)
+            if filterOutString(self.outputPorts[i], ("_")) != "":
+                image.text(((x + STANDARD_WIDTH) * SCALE - 3, (y + i + 2) * SCALE - 3), eDraw, fill=PORT_FONT_COLOR, anchor="rs", font=font)
 
     def getInputPortPixels(self, x, y):
-        return [(port, (x * SCALE, int((y + i  + 1.5) * SCALE))) for i, port in enumerate(self.inputPorts)]
+        return [(port, (x * SCALE, int((y + i  + 1.5) * SCALE))) for i, port in enumerate(self.inputPorts) if filterOutString(port,("_","^")) != ""]
     def getOutputPortPixels(self, x, y):
         return [(port, ((x + STANDARD_WIDTH) * SCALE, int((y + i  + 1.5) * SCALE))) for i, port in enumerate(self.outputPorts)]
 
@@ -158,7 +160,7 @@ class Board:
         totalWidth = self.width
         maxColumnHeight = self.height
         newImage = Image.new("RGB", (totalWidth, maxColumnHeight))
-        drawNewImage = ImageDraw.Draw(newImage)
+        drawNewImage = ImageDraw.Draw(newImage, "RGBA")
 
         drawNewImage.rectangle([(0,0), (totalWidth, maxColumnHeight)], fill=BACKGROUND)
         
@@ -179,7 +181,6 @@ class Board:
         outputCoordinates = dict()
         x = BORDER
         for column in self.columns:
-            
             for PPs in column.getAllBlocksInputPPs(x):
                 for PP in PPs:
                     if PP[0] in inputCoordinates:
@@ -201,7 +202,10 @@ class Board:
         for keyIn in inputCoordinates:
             if ((filterOutString(keyIn, filterChars) not in filterDictKeys(outputCoordinates, filterChars)) or ("^" in keyIn)) and ("_" not in keyIn):
                 for inputCoord in inputCoordinates[keyIn]:
-                    connections.append(((BORDER, inputCoordinates[keyIn][0][1]), inputCoord))
+                    newLine = ((BORDER, inputCoordinates[keyIn][0][1]), inputCoord)
+                    # while newLine[0][1] in [e[0][1] for e in connections if inputCoord != e[1]]:
+                    #     newLine = ((newLine[0][0], newLine[0][1] + WIREPIXELS*2), newLine[1])
+                    connections.append(newLine)
         
         for keyOut in outputCoordinates:
             if ((filterOutString(keyOut, filterChars) not in filterDictKeys(inputCoordinates, filterChars)) or ("^" in keyOut)) and ("_" not in keyOut):
@@ -239,7 +243,7 @@ class Board:
 
     def drawBadWires(self, drawImage):
         for e in self.findAllConnectionPixels():
-            drawImage.line(e, "black", WIREPIXELS)
+            drawImage.line(e, fill=WIRECOLOR, width=WIREPIXELS)
 
 
     def drawWires(self, drawImage):
