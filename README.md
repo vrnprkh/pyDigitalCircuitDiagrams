@@ -99,5 +99,5 @@ $(3,0)[{XOR: cin&.cin&, fg& ->_,sg&^.output&}{AND: cin&.cin&, fg& -> scout&}];
 $(3,0)[{OR: fcout&, scout& -> cin(&+1).cout&#10}]
 ```
 
-![](images/sampleImage2.PNG)
+![](images/SampleImage2.PNG)
 
